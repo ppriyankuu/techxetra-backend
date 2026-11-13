@@ -406,10 +406,21 @@ export async function createEventAdmin(adminUser: UserSelect, input: any) {
       capacity: input.capacity ?? null,
       capacityUnit: input.capacityUnit || input.capacity_unit || 'SEATS',
       status: input.status || 'DRAFT',
-      scoringEnabled: input.category === 'E_SPORTS' ? 1 : 0,
-      scoringStatus: input.category === 'E_SPORTS' ? 'OPEN' : 'NOT_APPLICABLE',
-      leaderboardPublic: 0,
-      volunteersCanScore: input.volunteersCanScore ? 1 : 0,
+      scoringEnabled:
+        input.category === 'E_SPORTS'
+          ? (input.scoringEnabled ?? input.scoring_enabled) === false
+            ? 0
+            : 1
+          : 0,
+      scoringStatus:
+        input.category === 'E_SPORTS'
+          ? input.scoringStatus || input.scoring_status || 'OPEN'
+          : 'NOT_APPLICABLE',
+      leaderboardPublic:
+        (input.leaderboardPublic ?? input.leaderboard_public) ? 1 : 0,
+      volunteersCanScore:
+        (input.volunteersCanScore ?? input.volunteers_can_score) ? 1 : 0,
+      maxRounds: input.maxRounds ?? input.max_rounds ?? 1,
       formSchema: validatedFormSchema,
       registrationOpensAt: input.registrationOpensAt ?? input.registration_opens_at,
       registrationClosesAt: input.registrationClosesAt ?? input.registration_closes_at,
@@ -489,7 +500,16 @@ export async function updateEventAdmin(adminUser: UserSelect, eventId: string, i
   if (input.capacity !== undefined) updates.capacity = input.capacity;
   if (input.capacityUnit) updates.capacityUnit = input.capacityUnit;
   if (input.status) updates.status = input.status;
-  if (input.volunteersCanScore !== undefined) updates.volunteersCanScore = input.volunteersCanScore ? 1 : 0;
+  const scoringEnabled = input.scoringEnabled ?? input.scoring_enabled;
+  if (scoringEnabled !== undefined) updates.scoringEnabled = scoringEnabled ? 1 : 0;
+  const scoringStatus = input.scoringStatus ?? input.scoring_status;
+  if (scoringStatus !== undefined) updates.scoringStatus = scoringStatus;
+  const leaderboardPublic = input.leaderboardPublic ?? input.leaderboard_public;
+  if (leaderboardPublic !== undefined) updates.leaderboardPublic = leaderboardPublic ? 1 : 0;
+  const volunteersCanScore = input.volunteersCanScore ?? input.volunteers_can_score;
+  if (volunteersCanScore !== undefined) updates.volunteersCanScore = volunteersCanScore ? 1 : 0;
+  const maxRounds = input.maxRounds ?? input.max_rounds;
+  if (maxRounds !== undefined) updates.maxRounds = maxRounds;
   if (input.registrationOpensAt !== undefined) updates.registrationOpensAt = input.registrationOpensAt;
   if (input.registrationClosesAt !== undefined) updates.registrationClosesAt = input.registrationClosesAt;
   if (input.startsAt !== undefined) updates.startsAt = input.startsAt;
